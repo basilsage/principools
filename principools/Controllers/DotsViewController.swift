@@ -6,15 +6,25 @@
 //  Copyright © 2019 DJ Satoda. All rights reserved.
 //
 
+
+
 import UIKit
 
-class PrinciplesViewController: UITableViewController {
+class DotsViewController: UITableViewController {
     
-    var principleArray = ["Play to win", "Work hard", "Be open to criticism"]
+    var dotArray = [Dot]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        let newDot = Dot()
+        newDot.body = "Ate at Iza Ramen"
+        dotArray.append(newDot)
+        
+        let newDot2 = Dot()
+        newDot2.body = "Went to CDMX > EU"
+        dotArray.append(newDot2)
+
     }
     
     //MARK: - Tableview Datasource Methods
@@ -22,23 +32,26 @@ class PrinciplesViewController: UITableViewController {
     // Populates cells
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "PrincipleItemCell", for: indexPath)
-        cell.textLabel?.text = principleArray[indexPath.row]
+        let cell = tableView.dequeueReusableCell(withIdentifier: "DotItemCell", for: indexPath)
+        cell.textLabel?.text = "\(dotArray[indexPath.row].body), \(dotArray[indexPath.row].score)"
         return cell
         
     }
     
     // Determines number of cells to display
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return principleArray.count
+        return dotArray.count
     }
     
     //MARK: - Tableview Delegate Methods
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print(principleArray[indexPath.row])
+        print(dotArray[indexPath.row])
         
-        tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+        dotArray[indexPath.row].score += 1
+        print("Body: \(dotArray[indexPath.row].body), Score: \(dotArray[indexPath.row].score)")
+        
+        tableView.reloadData()
         
         tableView.deselectRow(at: indexPath, animated: true)
     }
@@ -49,18 +62,19 @@ class PrinciplesViewController: UITableViewController {
     
         var textField = UITextField()
         
-        let alert = UIAlertController(title: "Add New Principle", message: "", preferredStyle: .alert)
+        let alert = UIAlertController(title: "Add New Dot", message: "", preferredStyle: .alert)
         
-        let action = UIAlertAction(title: "Add Principle", style: .default) { (action) in
-            // What will happen once user clicks add item button on our UIAlert
-            self.principleArray.append(textField.text!)
-            print(self.principleArray)
-            self.tableView.reloadData()
+        let action = UIAlertAction(title: "Add Dot", style: .default) { (action) in
+             // What will happen once user clicks add item button on our UIAlert
+            
+            let newDot = Dot()
+            newDot.body = textField.text!
+            
         }
         
         // what happens when alert bubble opens
         alert.addTextField { (alertTextField) in
-            alertTextField.placeholder = "Create new principle"
+            alertTextField.placeholder = "Create new dot"
             textField = alertTextField
             
         }
@@ -74,3 +88,6 @@ class PrinciplesViewController: UITableViewController {
     
 }
 
+//MARK: - To-Do
+// Text wrapping / truncation for long dots
+// Table Swipe Actions
