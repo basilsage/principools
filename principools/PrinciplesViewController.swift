@@ -10,7 +10,7 @@ import UIKit
 
 class PrinciplesViewController: UITableViewController {
     
-    let principleArray = ["Play to win", "Work hard", "Be open to criticism"]
+    var principleArray = ["Play to win", "Work hard", "Be open to criticism"]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -41,6 +41,34 @@ class PrinciplesViewController: UITableViewController {
         tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
         
         tableView.deselectRow(at: indexPath, animated: true)
+    }
+    
+    //MARK: - Add new items
+    
+    @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
+    
+        var textField = UITextField()
+        
+        let alert = UIAlertController(title: "Add New Principle", message: "", preferredStyle: .alert)
+        
+        let action = UIAlertAction(title: "Add Principle", style: .default) { (action) in
+            // What will happen once user clicks add item button on our UIAlert
+            self.principleArray.append(textField.text!)
+            print(self.principleArray)
+            self.tableView.reloadData()
+        }
+        
+        // what happens when alert bubble opens
+        alert.addTextField { (alertTextField) in
+            alertTextField.placeholder = "Create new principle"
+            textField = alertTextField
+            
+        }
+        
+        alert.addAction(action)
+        
+        present(alert, animated: true, completion: nil)
+    
     }
     
     
