@@ -13,7 +13,7 @@
 		225DA99522AFF04E007474E9 /* principools.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 225DA99322AFF04E007474E9 /* principools.xcdatamodeld */; };
 		225DA99722AFF04F007474E9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 225DA99622AFF04F007474E9 /* Assets.xcassets */; };
 		225DA99A22AFF04F007474E9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 225DA99822AFF04F007474E9 /* LaunchScreen.storyboard */; };
-		22F22A7422B09BF100E3EE4E /* Dot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 22F22A7322B09BF100E3EE4E /* Dot.swift */; };
+		2283116322B34A3C002C1748 /* PrincipleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2283116222B34A3C002C1748 /* PrincipleViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,7 +25,7 @@
 		225DA99622AFF04F007474E9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		225DA99922AFF04F007474E9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		225DA99B22AFF04F007474E9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		22F22A7322B09BF100E3EE4E /* Dot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dot.swift; sourceTree = "<group>"; };
+		2283116222B34A3C002C1748 /* PrincipleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrincipleViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,7 +64,6 @@
 				22F22A7722B09F5700E3EE4E /* Views */,
 				22F22A7822B09F6300E3EE4E /* Supporting Files */,
 				225DA99B22AFF04F007474E9 /* Info.plist */,
-				225DA99322AFF04E007474E9 /* principools.xcdatamodeld */,
 			);
 			path = principools;
 			sourceTree = "<group>";
@@ -72,7 +71,7 @@
 		22F22A7522B09F2E00E3EE4E /* Data Model */ = {
 			isa = PBXGroup;
 			children = (
-				22F22A7322B09BF100E3EE4E /* Dot.swift */,
+				225DA99322AFF04E007474E9 /* principools.xcdatamodeld */,
 			);
 			path = "Data Model";
 			sourceTree = "<group>";
@@ -80,6 +79,7 @@
 		22F22A7622B09F4200E3EE4E /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				2283116222B34A3C002C1748 /* PrincipleViewController.swift */,
 				225DA98E22AFF04E007474E9 /* DotsViewController.swift */,
 			);
 			path = Controllers;
@@ -174,9 +174,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				225DA98F22AFF04E007474E9 /* DotsViewController.swift in Sources */,
+				2283116322B34A3C002C1748 /* PrincipleViewController.swift in Sources */,
 				225DA98D22AFF04E007474E9 /* AppDelegate.swift in Sources */,
 				225DA99522AFF04E007474E9 /* principools.xcdatamodeld in Sources */,
-				22F22A7422B09BF100E3EE4E /* Dot.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
