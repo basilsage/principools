@@ -114,6 +114,7 @@ class DotsViewController: UITableViewController {
         
         self.tableView.reloadData()
         
+        
     }
     
     

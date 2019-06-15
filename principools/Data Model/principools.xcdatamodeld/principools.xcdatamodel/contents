@@ -5,13 +5,20 @@
         <attribute name="score" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="parentPrinciple" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Principle" inverseName="dots" inverseEntity="Principle" syncable="YES"/>
     </entity>
-    <entity name="Principle" representedClassName="Principle" syncable="YES" codeGenerationType="class">
+    <entity name="Pool" representedClassName="Pool" syncable="YES" codeGenerationType="class">
+        <attribute name="averageScore" optional="YES" attributeType="Decimal" defaultValueString="0.0" syncable="YES"/>
         <attribute name="name" attributeType="String" syncable="YES"/>
-        <attribute name="totalScore" optional="YES" attributeType="Decimal" defaultValueString="0.0" syncable="YES"/>
+        <relationship name="principles" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Principle" inverseName="parentPool" inverseEntity="Principle" syncable="YES"/>
+    </entity>
+    <entity name="Principle" representedClassName="Principle" syncable="YES" codeGenerationType="class">
+        <attribute name="averageScore" optional="YES" attributeType="Decimal" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="name" attributeType="String" syncable="YES"/>
         <relationship name="dots" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Dot" inverseName="parentPrinciple" inverseEntity="Dot" syncable="YES"/>
+        <relationship name="parentPool" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Pool" inverseName="principles" inverseEntity="Pool" syncable="YES"/>
     </entity>
     <elements>
-        <element name="Dot" positionX="170.2578125" positionY="66.5859375" width="128" height="88"/>
-        <element name="Principle" positionX="6.9375" positionY="87.28125" width="128" height="88"/>
+        <element name="Dot" positionX="314.01953125" positionY="-5.85546875" width="128" height="88"/>
+        <element name="Principle" positionX="-30.140625" positionY="-54.47265625" width="128" height="103"/>
+        <element name="Pool" positionX="-228.48828125" positionY="-45.32421875" width="128" height="88"/>
     </elements>
 </model>

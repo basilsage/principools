@@ -13,12 +13,18 @@ class PrincipleViewController: UITableViewController {
     
     var principleArray = [Principle]()
     
+    var selectedPool : Pool? {
+        didSet {
+            loadItems()
+        }
+    }
+    
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        loadItems()
+        
 
     }
 
@@ -75,7 +81,17 @@ class PrincipleViewController: UITableViewController {
         self.tableView.reloadData()
     }
     
-    func loadItems(with request: NSFetchRequest<Principle> = Principle.fetchRequest()) {
+    func loadItems(with request: NSFetchRequest<Principle> = Principle.fetchRequest(),predicate: NSPredicate? = nil) {
+        
+        let poolPredicate = NSPredicate(format: "parentPool.name MATCHES %@", selectedPool!.name!)
+        
+        
+        
+        if let additionalPredicate = predicate {
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [poolPredicate, additionalPredicate])
+        } else {
+            request.predicate = poolPredicate
+        }
         
         do {
             principleArray = try context.fetch(request)
@@ -97,6 +113,7 @@ class PrincipleViewController: UITableViewController {
             
             let newPrinciple = Principle(context: self.context)
             newPrinciple.name = textField.text!
+            newPrinciple.parentPool = self.selectedPool
             self.principleArray.append(newPrinciple)
             
             self.saveItems()
@@ -124,14 +141,26 @@ extension PrincipleViewController: UISearchBarDelegate {
         
         print(searchBar.text!)
         
-        request.predicate = NSPredicate(format: "name CONTAINS[cd] %@", searchBar.text!)
+        let predicate = NSPredicate(format: "name CONTAINS[cd] %@", searchBar.text!)
         
         let sortDescriptor = NSSortDescriptor(key: "name", ascending: true)
         
         request.sortDescriptors = [sortDescriptor]
         
-        loadItems(with: request)
+        loadItems(with: request, predicate: predicate)
         
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text?.count == 0 {
+            loadItems()
+            
+            // DispatchQueue Assigns projects to different threads
+            DispatchQueue.main.async {
+                searchBar.resignFirstResponder()
+            }
+            
+        }
     }
     
 }

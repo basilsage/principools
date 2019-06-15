@@ -14,6 +14,7 @@
 		225DA99722AFF04F007474E9 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 225DA99622AFF04F007474E9 /* Assets.xcassets */; };
 		225DA99A22AFF04F007474E9 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 225DA99822AFF04F007474E9 /* LaunchScreen.storyboard */; };
 		2283116322B34A3C002C1748 /* PrincipleViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2283116222B34A3C002C1748 /* PrincipleViewController.swift */; };
+		2299A05922B47C1B00A00EFB /* PoolsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2299A05822B47C1B00A00EFB /* PoolsViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -26,6 +27,7 @@
 		225DA99922AFF04F007474E9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		225DA99B22AFF04F007474E9 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		2283116222B34A3C002C1748 /* PrincipleViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrincipleViewController.swift; sourceTree = "<group>"; };
+		2299A05822B47C1B00A00EFB /* PoolsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PoolsViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,6 +81,7 @@
 		22F22A7622B09F4200E3EE4E /* Controllers */ = {
 			isa = PBXGroup;
 			children = (
+				2299A05822B47C1B00A00EFB /* PoolsViewController.swift */,
 				2283116222B34A3C002C1748 /* PrincipleViewController.swift */,
 				225DA98E22AFF04E007474E9 /* DotsViewController.swift */,
 			);
@@ -175,6 +178,7 @@
 			files = (
 				225DA98F22AFF04E007474E9 /* DotsViewController.swift in Sources */,
 				2283116322B34A3C002C1748 /* PrincipleViewController.swift in Sources */,
+				2299A05922B47C1B00A00EFB /* PoolsViewController.swift in Sources */,
 				225DA98D22AFF04E007474E9 /* AppDelegate.swift in Sources */,
 				225DA99522AFF04E007474E9 /* principools.xcdatamodeld in Sources */,
 			);
