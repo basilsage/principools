@@ -9,11 +9,12 @@
 
 
 import UIKit
-import CoreData
+import RealmSwift
 
 class DotsViewController: UITableViewController {
     
-    var dotArray = [Dot]()
+    var dots : Results<Dot>?
+    let realm = try! Realm()
     
     var selectedPrinciple : Principle? {
         didSet {
@@ -22,14 +23,9 @@ class DotsViewController: UITableViewController {
         }
     }
     
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-    
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
-        
-        //file path to SQLite database
-        print(FileManager.default.urls(for: .documentDirectory, in: .userDomainMask))
+        // Do any additional setup after loading the view
         
     }
     
@@ -37,14 +33,14 @@ class DotsViewController: UITableViewController {
     
     // Determines number of cells to display
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return dotArray.count
+        return dots?.count ?? 1
     }
     
     // Populates cells
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "DotItemCell", for: indexPath)
-        cell.textLabel?.text = "\(dotArray[indexPath.row].body!), \(dotArray[indexPath.row].score)"
+        cell.textLabel?.text = ("\(dots![indexPath.row].name) \(dots![indexPath.row].score)") 
         return cell
         
     }
@@ -52,16 +48,24 @@ class DotsViewController: UITableViewController {
     //MARK: - Tableview Delegate Methods
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        print(dotArray[indexPath.row])
         
-        dotArray[indexPath.row].score += 1
-        print("Body: \(dotArray[indexPath.row].body ?? ""), Score: \(dotArray[indexPath.row].score)")
         
-        saveItems()
         
+        if let dot = dots?[indexPath.row] {
+            do {
+                try realm.write {
+                    dot.score += 1
+//                    realm.delete(dot)
+                }
+            } catch {
+                print("Error saving done status, \(error)")
+            }
+        }
         tableView.reloadData()
         
         tableView.deselectRow(at: indexPath, animated: true)
+        
+        
     }
     
     //MARK: - Add new items
@@ -75,15 +79,21 @@ class DotsViewController: UITableViewController {
         let action = UIAlertAction(title: "Add Dot", style: .default) { (action) in
              // What will happen once user clicks add item button on our UIAlert
             
+            if let currentPrinciple = self.selectedPrinciple {
+                do {
+                    try self.realm.write {
+                        let newDot = Dot()
+                        newDot.name = textField.text!
+                        newDot.dateCreated = Date()
+                        currentPrinciple.dots.append(newDot)
+                        
+                        self.tableView.reloadData()
+                    }
+                } catch {
+                    print("Error saving new items \(error)")
+                }
+            }
             
-            let newDot = Dot(context: self.context)
-            newDot.body = textField.text!
-            newDot.parentPrinciple = self.selectedPrinciple
-            self.dotArray.append(newDot)
-            
-            self.saveItems()
-            
-            self.tableView.reloadData()
             
         }
         
@@ -102,41 +112,14 @@ class DotsViewController: UITableViewController {
     
     //MARK: - Model Manipulation Methods
     
-    func saveItems() {
-        
-        do {
-            
-            try context.save()
-            
-        } catch {
-            print("Error saving context \(error)")
-        }
-        
-        self.tableView.reloadData()
-        
-        
-    }
-    
     
     // = Dot.fetchRequest() is a default value
     // with request is an internal (vs. external) parameter
-    func loadItems(with request: NSFetchRequest<Dot> = Dot.fetchRequest(), predicate: NSPredicate? = nil) {
+    func loadItems() {
         
-        let principlePredicate = NSPredicate(format: "parentPrinciple.name MATCHES %@", selectedPrinciple!.name!)
-        
-        if let additionalPredicate = predicate {
-            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [principlePredicate, additionalPredicate])
-        } else {
-            request.predicate = principlePredicate
-        }
-        
-        do {
-            dotArray = try context.fetch(request)
-        } catch {
-            print("Error fetching data from context \(error)")
-        }
-        
+        dots = selectedPrinciple?.dots.sorted(byKeyPath: "dateCreated", ascending: true)
         tableView.reloadData()
+
         
     }
     
@@ -146,32 +129,25 @@ class DotsViewController: UITableViewController {
 }
 
 extension DotsViewController: UISearchBarDelegate {
-    
+
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        let request : NSFetchRequest<Dot> = Dot.fetchRequest()
         
         print(searchBar.text!)
-        
-        let predicate = NSPredicate(format: "body CONTAINS[cd] %@", searchBar.text!)
-        
-        let sortDescriptor = NSSortDescriptor(key: "body", ascending: true)
-        
-        request.sortDescriptors = [sortDescriptor]
-        
-        loadItems(with: request, predicate: predicate)
+        dots = dots?.filter("name CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "dateCreated", ascending: true)
+        tableView.reloadData()
         
     }
-    
+
     // triggers when text is changed AND text goes to zero
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchBar.text?.count == 0 {
             loadItems()
-           
+
             // DispatchQueue Assigns projects to different threads
             DispatchQueue.main.async {
                 searchBar.resignFirstResponder()
             }
-            
+
         }
     }
 }

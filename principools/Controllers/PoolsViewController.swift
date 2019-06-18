@@ -7,21 +7,23 @@
 //
 
 import UIKit
-import CoreData
+import RealmSwift
 
 class PoolsViewController: UITableViewController {
     
-    var poolArray = [Pool]()
     
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    let realm = try! Realm()
     
-    
+    var pools : Results<Pool>?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         print("Hello, world!")
-        loadItems()
+        let realmFilePath = Realm.Configuration.defaultConfiguration.fileURL
+        print("Realm File Path",realmFilePath!)
+        
+        loadPools()
         
     }
 
@@ -32,12 +34,15 @@ class PoolsViewController: UITableViewController {
         let alert = UIAlertController(title: "Add New Pool", message: "", preferredStyle: .alert)
         
         let action = UIAlertAction(title: "Add Pool", style: .default) { (action) in
-            let newPool = Pool(context: self.context)
+            let newPool = Pool()
             newPool.name = textField.text!
-            self.poolArray.append(newPool)
             
-            self.saveItems()
+            // no longer need to append to an array, because Realm uses auto-updating container
+            
+            self.savePools(pool: newPool)
+            print("Saved")
             self.tableView.reloadData()
+            print("Reloaded")
         }
         
         alert.addTextField { (alertTextField) in
@@ -54,12 +59,14 @@ class PoolsViewController: UITableViewController {
     
     //MARK: - TableView Datasource Methods
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return poolArray.count
+        
+        // if pools.count = nil, then return 1
+        return pools?.count ?? 1
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "PoolItemCell", for: indexPath)
-        cell.textLabel?.text = poolArray[indexPath.row].name
+        cell.textLabel?.text = pools?[indexPath.row].name ?? "No pools added yet"
         
         return cell
     }
@@ -74,58 +81,48 @@ class PoolsViewController: UITableViewController {
         let destinationVC = segue.destination as! PrincipleViewController
         
         if let indexPath = tableView.indexPathForSelectedRow {
-            destinationVC.selectedPool = poolArray[indexPath.row]
+            destinationVC.selectedPool = pools?[indexPath.row]
         }
     }
     
     //MARK: - Data Manipulation Methods
     
-    func saveItems() {
+    func savePools(pool: Pool) {
         do {
-            try context.save()
+            try realm.write {
+                realm.add(pool)
+            }
         } catch {
-            print("Error saving context \(error)")
-        }
-        
-        self.tableView.reloadData()
-    }
-    
-    func loadItems(with request: NSFetchRequest<Pool> = Pool.fetchRequest(),predicate: NSPredicate? = nil) {
-        
-        request.predicate = predicate
-        
-        do {
-            poolArray = try context.fetch(request)
-        } catch {
-            print("Error fetching data from context \(error)")
+            print("Error saving \(error)")
         }
         
         tableView.reloadData()
     }
     
+    func loadPools() {
+        
+         pools = realm.objects(Pool.self)
+        
+        tableView.reloadData()
+    }
+
     
 }
 
 extension PoolsViewController: UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        let request : NSFetchRequest<Pool> = Pool.fetchRequest()
         
         print(searchBar.text!)
-        
-        let predicate = NSPredicate(format: "name CONTAINS[cd] %@", searchBar.text!)
-        
-        let sortDescriptor = NSSortDescriptor(key: "name", ascending: true)
-        
-        request.sortDescriptors = [sortDescriptor]
-        
-        loadItems(with: request, predicate: predicate)
+        pools = pools?.filter("name CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "dateCreated", ascending: true)
+        tableView.reloadData()
         
     }
     
+    // triggers when text is changed AND text goes to zero
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchBar.text?.count == 0 {
-            loadItems()
+            loadPools()
             
             // DispatchQueue Assigns projects to different threads
             DispatchQueue.main.async {
@@ -134,5 +131,4 @@ extension PoolsViewController: UISearchBarDelegate {
             
         }
     }
-    
 }

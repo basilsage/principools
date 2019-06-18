@@ -7,19 +7,18 @@
 //
 
 import UIKit
-import CoreData
+import RealmSwift
 
 class PrincipleViewController: UITableViewController {
     
-    var principleArray = [Principle]()
+    var principles : Results<Principle>?
+    let realm = try! Realm()
     
     var selectedPool : Pool? {
         didSet {
             loadItems()
         }
     }
-    
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,13 +35,13 @@ class PrincipleViewController: UITableViewController {
     
     // Determine number of cells to display
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return principleArray.count
+        return principles?.count ?? 1
     }
     
     // Populate cells
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "PrincipleItemCell", for: indexPath)
-        cell.textLabel?.text = principleArray[indexPath.row].name
+        cell.textLabel?.text = principles?[indexPath.row].name ?? "No principles added yet"
         
         return cell
     }
@@ -63,42 +62,19 @@ class PrincipleViewController: UITableViewController {
         let destinationVC = segue.destination as! DotsViewController
         
         if let indexPath = tableView.indexPathForSelectedRow {
-            destinationVC.selectedPrinciple = principleArray[indexPath.row]
+            destinationVC.selectedPrinciple = principles?[indexPath.row]
         }
     }
     
     
     //MARK: - Data Manipulation Methods
     // save & load
+
     
-    func saveItems() {
-        do {
-            try context.save()
-        } catch {
-            print("Error saving context \(error)")
-        }
-        
-        self.tableView.reloadData()
-    }
-    
-    func loadItems(with request: NSFetchRequest<Principle> = Principle.fetchRequest(),predicate: NSPredicate? = nil) {
-        
-        let poolPredicate = NSPredicate(format: "parentPool.name MATCHES %@", selectedPool!.name!)
-        
-        
-        
-        if let additionalPredicate = predicate {
-            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [poolPredicate, additionalPredicate])
-        } else {
-            request.predicate = poolPredicate
-        }
-        
-        do {
-            principleArray = try context.fetch(request)
-        } catch {
-            print("Error fetching data from context \(error)")
-        }
-        
+    func loadItems() {
+
+        principles = selectedPool?.principles.sorted(byKeyPath: "name", ascending: true)
+
         tableView.reloadData()
     }
     
@@ -111,12 +87,20 @@ class PrincipleViewController: UITableViewController {
         
         let action = UIAlertAction(title: "Add Principle", style: .default) { (action) in
             
-            let newPrinciple = Principle(context: self.context)
-            newPrinciple.name = textField.text!
-            newPrinciple.parentPool = self.selectedPool
-            self.principleArray.append(newPrinciple)
+            if let currentPool = self.selectedPool {
+                
+                do {
+                    try self.realm.write {
+                        let newPrinciple = Principle()
+                        newPrinciple.name = textField.text!
+                        currentPool.principles.append(newPrinciple)
+                    }
+                } catch {
+                    print("Error saving new principle \(error)")
+                }
+                
+            }
             
-            self.saveItems()
             self.tableView.reloadData()
             
         }
@@ -137,22 +121,17 @@ class PrincipleViewController: UITableViewController {
 extension PrincipleViewController: UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        let request : NSFetchRequest<Principle> = Principle.fetchRequest()
         
         print(searchBar.text!)
-        
-        let predicate = NSPredicate(format: "name CONTAINS[cd] %@", searchBar.text!)
-        
-        let sortDescriptor = NSSortDescriptor(key: "name", ascending: true)
-        
-        request.sortDescriptors = [sortDescriptor]
-        
-        loadItems(with: request, predicate: predicate)
+        principles = principles?.filter("name CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "dateCreated", ascending: true)
+        tableView.reloadData()
         
     }
     
+    // triggers when text is changed AND text goes to zero
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchBar.text?.count == 0 {
+            
             loadItems()
             
             // DispatchQueue Assigns projects to different threads
@@ -162,5 +141,4 @@ extension PrincipleViewController: UISearchBarDelegate {
             
         }
     }
-    
 }
