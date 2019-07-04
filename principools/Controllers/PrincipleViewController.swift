@@ -8,6 +8,7 @@
 
 import UIKit
 import RealmSwift
+import SwipeCellKit
 
 class PrincipleViewController: UITableViewController {
     
@@ -16,13 +17,14 @@ class PrincipleViewController: UITableViewController {
     
     var selectedPool : Pool? {
         didSet {
-            loadItems()
+            loadPrinciples()
         }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        tableView.rowHeight = 80
         
 
     }
@@ -40,8 +42,24 @@ class PrincipleViewController: UITableViewController {
     
     // Populate cells
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "PrincipleItemCell", for: indexPath)
+        
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! SwipeTableViewCell
+        
+        cell.delegate = self
+        
         cell.textLabel?.text = principles?[indexPath.row].name ?? "No principles added yet"
+        
+//        let principleName = principles?[indexPath.row].name
+
+        
+        
+//        let scores : Float = realm.objects(Principle).reduce(0) { sum, dot in
+//            return sum + dot.score.sum("score")
+//        }
+//
+//        print(scores)
+//
+//        cell.textLabel?.text = String(averageDotScore)
         
         return cell
     }
@@ -71,9 +89,9 @@ class PrincipleViewController: UITableViewController {
     // save & load
 
     
-    func loadItems() {
+    func loadPrinciples() {
 
-        principles = selectedPool?.principles.sorted(byKeyPath: "name", ascending: true)
+        principles = selectedPool?.principles.sorted(byKeyPath: "dateCreated", ascending: true)
 
         tableView.reloadData()
     }
@@ -116,6 +134,19 @@ class PrincipleViewController: UITableViewController {
         
     }
     
+    //MARK: - Delete Data from Swipe
+    func updateModel(at indexPath: IndexPath) {
+        if let principleForDeletion = self.principles?[indexPath.row] {
+            do {
+                try self.realm.write {
+                    self.realm.delete(principleForDeletion)
+                }
+            } catch {
+                print("Error deleting pool, \(error)")
+            }
+        }
+    }
+    
 }
 
 extension PrincipleViewController: UISearchBarDelegate {
@@ -132,7 +163,7 @@ extension PrincipleViewController: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchBar.text?.count == 0 {
             
-            loadItems()
+            loadPrinciples()
             
             // DispatchQueue Assigns projects to different threads
             DispatchQueue.main.async {
@@ -141,4 +172,26 @@ extension PrincipleViewController: UISearchBarDelegate {
             
         }
     }
+}
+
+extension PrincipleViewController : SwipeTableViewCellDelegate {
+    
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
+        
+        let moveAction = SwipeAction(style: .default, title: "Move") { action, indexPath in
+            // handle action by updating model with new classification
+            
+        }
+        
+        let deleteAction = SwipeAction(style: .destructive, title: "Expired") { action, indexPath in
+            // handle action by updating model with deletion
+            
+            
+        }
+        
+        return  (orientation == .right ? [moveAction, deleteAction] : nil)
+        
+    }
+    
+    
 }

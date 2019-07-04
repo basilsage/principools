@@ -8,6 +8,8 @@
 
 import UIKit
 import RealmSwift
+import ChameleonFramework
+import SwipeCellKit
 
 class PoolsViewController: UITableViewController {
     
@@ -24,6 +26,9 @@ class PoolsViewController: UITableViewController {
         print("Realm File Path",realmFilePath!)
         
         loadPools()
+        
+        tableView.rowHeight = 80
+        tableView.separatorColor = FlatPowderBlue()
         
     }
 
@@ -64,9 +69,19 @@ class PoolsViewController: UITableViewController {
         return pools?.count ?? 1
     }
     
+    
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "PoolItemCell", for: indexPath)
+        
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! SwipeTableViewCell
+        
+        cell.delegate = self
+        
         cell.textLabel?.text = pools?[indexPath.row].name ?? "No pools added yet"
+        
+        if let color = FlatSkyBlue().darken(byPercentage: CGFloat(indexPath.row) / CGFloat(pools!.count)){
+            cell.backgroundColor = color
+            cell.textLabel?.textColor = ContrastColorOf(color, returnFlat: true)
+        }
         
         return cell
     }
@@ -105,6 +120,19 @@ class PoolsViewController: UITableViewController {
         
         tableView.reloadData()
     }
+    
+    //MARK: - Delete Data from Swipe
+    func updateModel(at indexPath: IndexPath) {
+        if let poolForDeletion = self.pools?[indexPath.row] {
+            do {
+                try self.realm.write {
+                    self.realm.delete(poolForDeletion)
+                }
+            } catch {
+                print("Error deleting pool, \(error)")
+            }
+        }
+    }
 
     
 }
@@ -131,4 +159,22 @@ extension PoolsViewController: UISearchBarDelegate {
             
         }
     }
+}
+
+
+extension PoolsViewController : SwipeTableViewCellDelegate {
+    
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
+        
+        let deleteAction = SwipeAction(style: .destructive, title: "Expired") { action, indexPath in
+            // handle action by updating model with deletion
+            
+            
+        }
+        
+        return  (orientation == .right ? [deleteAction] : nil)
+        
+    }
+    
+    
 }

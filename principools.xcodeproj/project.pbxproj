@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		2249AA5B22CD7FBA0014248D /* MovePrinciplesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2249AA5A22CD7FBA0014248D /* MovePrinciplesViewController.swift */; };
 		2256A1AE22B6A13B009DF9B9 /* Dot.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2256A1AD22B6A13B009DF9B9 /* Dot.swift */; };
 		2256A1B022B6A144009DF9B9 /* Principle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2256A1AF22B6A144009DF9B9 /* Principle.swift */; };
 		2256A1B222B6A18E009DF9B9 /* Pool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2256A1B122B6A18E009DF9B9 /* Pool.swift */; };
@@ -22,6 +23,7 @@
 
 /* Begin PBXFileReference section */
 		0817632F912F7A97AB24A890 /* Pods_principools.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_principools.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		2249AA5A22CD7FBA0014248D /* MovePrinciplesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MovePrinciplesViewController.swift; sourceTree = "<group>"; };
 		2256A1AD22B6A13B009DF9B9 /* Dot.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Dot.swift; sourceTree = "<group>"; };
 		2256A1AF22B6A144009DF9B9 /* Principle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Principle.swift; sourceTree = "<group>"; };
 		2256A1B122B6A18E009DF9B9 /* Pool.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Pool.swift; sourceTree = "<group>"; };
@@ -97,6 +99,7 @@
 				2299A05822B47C1B00A00EFB /* PoolsViewController.swift */,
 				2283116222B34A3C002C1748 /* PrincipleViewController.swift */,
 				225DA98E22AFF04E007474E9 /* DotsViewController.swift */,
+				2249AA5A22CD7FBA0014248D /* MovePrinciplesViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -235,15 +238,19 @@
 			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-principools/Pods-principools-frameworks.sh",
+				"${BUILT_PRODUCTS_DIR}/ChameleonFramework/ChameleonFramework.framework",
 				"${BUILT_PRODUCTS_DIR}/Realm/Realm.framework",
 				"${BUILT_PRODUCTS_DIR}/RealmSwift/RealmSwift.framework",
+				"${BUILT_PRODUCTS_DIR}/SwipeCellKit/SwipeCellKit.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
 			);
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ChameleonFramework.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RealmSwift.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SwipeCellKit.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -259,6 +266,7 @@
 			files = (
 				225DA98F22AFF04E007474E9 /* DotsViewController.swift in Sources */,
 				2283116322B34A3C002C1748 /* PrincipleViewController.swift in Sources */,
+				2249AA5B22CD7FBA0014248D /* MovePrinciplesViewController.swift in Sources */,
 				2299A05922B47C1B00A00EFB /* PoolsViewController.swift in Sources */,
 				225DA98D22AFF04E007474E9 /* AppDelegate.swift in Sources */,
 				2256A1AE22B6A13B009DF9B9 /* Dot.swift in Sources */,

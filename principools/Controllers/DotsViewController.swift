@@ -10,6 +10,7 @@
 
 import UIKit
 import RealmSwift
+import SwipeCellKit
 
 class DotsViewController: UITableViewController {
     
@@ -19,13 +20,16 @@ class DotsViewController: UITableViewController {
     var selectedPrinciple : Principle? {
         didSet {
             // everything in here will happen as soon as selectedPrinciple gets assigned a value
-            loadItems()
+            loadDots()
         }
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view
+        
+        tableView.estimatedRowHeight = 80
+        tableView.rowHeight = UITableView.automaticDimension
         
     }
     
@@ -39,8 +43,14 @@ class DotsViewController: UITableViewController {
     // Populates cells
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "DotItemCell", for: indexPath)
-        cell.textLabel?.text = ("\(dots![indexPath.row].name) \(dots![indexPath.row].score)") 
+        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! SwipeTableViewCell
+        
+        cell.delegate = self
+        
+        let scoreString = String(format: "%.0f", dots![indexPath.row].score)
+            
+        cell.textLabel?.text = ("\(dots![indexPath.row].name) (\(scoreString))")
+        
         return cell
         
     }
@@ -53,10 +63,17 @@ class DotsViewController: UITableViewController {
         
         if let dot = dots?[indexPath.row] {
             do {
-                try realm.write {
-                    dot.score += 1
-//                    realm.delete(dot)
+                
+                if dot.score != 3 {
+                    try realm.write {
+                        dot.score += 1
+                    }
+                } else if dot.score == 3 {
+                    try realm.write {
+                        dot.score = -3
+                    }
                 }
+                
             } catch {
                 print("Error saving done status, \(error)")
             }
@@ -115,7 +132,7 @@ class DotsViewController: UITableViewController {
     
     // = Dot.fetchRequest() is a default value
     // with request is an internal (vs. external) parameter
-    func loadItems() {
+    func loadDots() {
         
         dots = selectedPrinciple?.dots.sorted(byKeyPath: "dateCreated", ascending: true)
         tableView.reloadData()
@@ -123,6 +140,18 @@ class DotsViewController: UITableViewController {
         
     }
     
+    //MARK: - Delete Data from Swipe
+    func updateModel(at indexPath: IndexPath) {
+        if let dotForDeletion = self.dots?[indexPath.row] {
+            do {
+                try self.realm.write {
+                    self.realm.delete(dotForDeletion)
+                }
+            } catch {
+                print("Error deleting pool, \(error)")
+            }
+        }
+    }
     
     
     
@@ -141,7 +170,7 @@ extension DotsViewController: UISearchBarDelegate {
     // triggers when text is changed AND text goes to zero
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchBar.text?.count == 0 {
-            loadItems()
+            loadDots()
 
             // DispatchQueue Assigns projects to different threads
             DispatchQueue.main.async {
@@ -152,6 +181,28 @@ extension DotsViewController: UISearchBarDelegate {
     }
 }
 
+extension DotsViewController : SwipeTableViewCellDelegate {
+    
+    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
+        
+        let moveAction = SwipeAction(style: .default, title: "Move") { action, indexPath in
+            // handle action by updating model with new classification
+            
+        }
+        
+        let deleteAction = SwipeAction(style: .destructive, title: "Expired") { action, indexPath in
+            // handle action by updating model with deletion
+            
+            
+        }
+        
+        return  (orientation == .right ? [moveAction, deleteAction] : nil)
+        
+    }
+    
+    
+}
+
 //MARK: - To-Do
 // Text wrapping / truncation for long dots
 // 1. Table Swipe Actions
@@ -159,3 +210,4 @@ extension DotsViewController: UISearchBarDelegate {
 // 1b.
 //     context.delete(dotArray[indexPath.row]) #removes data from permanent container
 //     dotArray.remove(at: indexPath.row) #removes from dotArray used to loadup tableview
+// https://github.com/TheMindStudios/WheelPicker
