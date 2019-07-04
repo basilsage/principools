@@ -77,10 +77,16 @@ class PrincipleViewController: UITableViewController {
     
     // triggered just before we perform segue
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        let destinationVC = segue.destination as! DotsViewController
         
-        if let indexPath = tableView.indexPathForSelectedRow {
-            destinationVC.selectedPrinciple = principles?[indexPath.row]
+        
+        if segue.identifier == "goToDots" {
+            let destinationVC = segue.destination as! DotsViewController
+            
+            if let indexPath = tableView.indexPathForSelectedRow {
+                destinationVC.selectedPrinciple = principles?[indexPath.row]
+            }
+        } else if segue.identifier != "goToMovePrinciples" {
+            print("poo")
         }
     }
     
@@ -135,16 +141,35 @@ class PrincipleViewController: UITableViewController {
     }
     
     //MARK: - Delete Data from Swipe
-    func updateModel(at indexPath: IndexPath) {
-        if let principleForDeletion = self.principles?[indexPath.row] {
-            do {
-                try self.realm.write {
-                    self.realm.delete(principleForDeletion)
+    func deletePrinciple(at indexPath: IndexPath) {
+        
+        let alert = UIAlertController(title: "Delete Principle", message: "Are you sure?", preferredStyle: .alert)
+        
+        // dismiss stats  window
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        
+        // reset total savings to $0
+        let deleteAction = UIAlertAction(title: "Delete", style: .default) { (action) in
+            
+            if let principleForDeletion = self.principles?[indexPath.row] {
+                do {
+                    try self.realm.write {
+                        self.realm.delete(principleForDeletion)
+                        print("Success deleting principle")
+                        self.tableView.reloadData()
+                    }
+                } catch {
+                    print("Error deleting pool, \(error)")
                 }
-            } catch {
-                print("Error deleting pool, \(error)")
             }
+            
         }
+        
+        alert.addAction(cancelAction)
+        alert.addAction(deleteAction)
+        present(alert, animated: true, completion: nil)
+        
+
     }
     
 }
@@ -180,14 +205,15 @@ extension PrincipleViewController : SwipeTableViewCellDelegate {
         
         let moveAction = SwipeAction(style: .default, title: "Move") { action, indexPath in
             // handle action by updating model with new classification
-            
+            self.performSegue(withIdentifier: "goToMovePrinciples", sender: self)
         }
         
-        let deleteAction = SwipeAction(style: .destructive, title: "Expired") { action, indexPath in
+        let deleteAction = SwipeAction(style: .destructive, title: "Delete") { action, indexPath in
             // handle action by updating model with deletion
-            
-            
+            self.deletePrinciple(at: indexPath)
         }
+        
+        deleteAction.image = UIImage(named: "delete-icon")
         
         return  (orientation == .right ? [moveAction, deleteAction] : nil)
         
@@ -195,3 +221,4 @@ extension PrincipleViewController : SwipeTableViewCellDelegate {
     
     
 }
+

@@ -121,22 +121,42 @@ class PoolsViewController: UITableViewController {
         tableView.reloadData()
     }
     
-    //MARK: - Delete Data from Swipe
-    func updateModel(at indexPath: IndexPath) {
-        if let poolForDeletion = self.pools?[indexPath.row] {
-            do {
-                try self.realm.write {
-                    self.realm.delete(poolForDeletion)
+    //MARK: - Delete Pools
+    func deletePool(at indexPath: IndexPath) {
+       
+        let alert = UIAlertController(title: "Delete Pool", message: "Are you sure?", preferredStyle: .alert)
+        
+        // dismiss stats  window
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        
+        // reset total savings to $0
+        let deleteAction = UIAlertAction(title: "Delete", style: .default) { (action) in
+            
+            if let poolForDeletion = self.pools?[indexPath.row] {
+                do {
+                    try self.realm.write {
+                        self.realm.delete(poolForDeletion)
+                        print("Success deleting pool")
+                        self.tableView.reloadData()
+                    }
+                } catch {
+                    print("Error deleting pool, \(error)")
                 }
-            } catch {
-                print("Error deleting pool, \(error)")
             }
+            
         }
+        
+        alert.addAction(cancelAction)
+        alert.addAction(deleteAction)
+        present(alert, animated: true, completion: nil)
+        
+        
     }
 
     
 }
 
+//MARK: - Extension: Search Bar
 extension PoolsViewController: UISearchBarDelegate {
     
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
@@ -161,16 +181,19 @@ extension PoolsViewController: UISearchBarDelegate {
     }
 }
 
-
+//MARK: - Extension: Swipe Cells
 extension PoolsViewController : SwipeTableViewCellDelegate {
     
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
         
-        let deleteAction = SwipeAction(style: .destructive, title: "Expired") { action, indexPath in
+        let deleteAction = SwipeAction(style: .destructive, title: "Delete") { action, indexPath in
             // handle action by updating model with deletion
             
+            self.deletePool(at: indexPath)
             
         }
+        
+        deleteAction.image = UIImage(named: "delete-icon")
         
         return  (orientation == .right ? [deleteAction] : nil)
         

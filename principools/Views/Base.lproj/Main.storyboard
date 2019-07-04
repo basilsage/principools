@@ -80,6 +80,9 @@
                                     <rect key="frame" x="0.0" y="0.0" width="376" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableViewCellContentView>
+                                <connections>
+                                    <segue destination="t1A-7r-o4V" kind="presentation" identifier="goToMovePrinciples" id="CVU-sA-r6g"/>
+                                </connections>
                             </tableViewCell>
                         </prototypes>
                         <connections>
@@ -101,7 +104,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="UhY-yv-8Gn" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="886" y="130"/>
+            <point key="canvasLocation" x="865" y="130"/>
         </scene>
         <!--Dots-->
         <scene sceneID="Hsp-yU-EXd">
@@ -180,7 +183,7 @@
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="APk-tp-tan" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1698" y="818"/>
+            <point key="canvasLocation" x="865" y="916"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="Dfd-rI-eah">
