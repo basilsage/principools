@@ -20,6 +20,7 @@ class DotsViewController: UITableViewController {
     var selectedPrinciple : Principle? {
         didSet {
             // everything in here will happen as soon as selectedPrinciple gets assigned a value
+            print("selectedPrinciple set")
             loadDots()
         }
     }
@@ -28,8 +29,7 @@ class DotsViewController: UITableViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view
         
-        tableView.estimatedRowHeight = 80
-        tableView.rowHeight = UITableView.automaticDimension
+        tableView.rowHeight = 80
         
     }
     
@@ -114,14 +114,19 @@ class DotsViewController: UITableViewController {
             
         }
         
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        
         // what happens when alert bubble opens
         alert.addTextField { (alertTextField) in
             alertTextField.placeholder = "Create new dot"
+            alertTextField.autocapitalizationType = .sentences
+            alertTextField.autocorrectionType = .yes
             textField = alertTextField
             
         }
         
         alert.addAction(action)
+        alert.addAction(cancelAction)
         
         present(alert, animated: true, completion: nil)
     
@@ -146,6 +151,8 @@ class DotsViewController: UITableViewController {
             do {
                 try self.realm.write {
                     self.realm.delete(dotForDeletion)
+                    print("Dot deleted succesfully")
+                    tableView.reloadData()
                 }
             } catch {
                 print("Error deleting pool, \(error)")
@@ -158,7 +165,11 @@ class DotsViewController: UITableViewController {
 }
 
 extension DotsViewController: UISearchBarDelegate {
-
+    
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        searchBar.tintColor = UIColor.black
+    }
+    
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         
         print(searchBar.text!)
@@ -185,18 +196,52 @@ extension DotsViewController : SwipeTableViewCellDelegate {
     
     func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
         
-        let moveAction = SwipeAction(style: .default, title: "Move") { action, indexPath in
-            // handle action by updating model with new classification
-            
-        }
         
-        let deleteAction = SwipeAction(style: .destructive, title: "Expired") { action, indexPath in
+        let deleteAction = SwipeAction(style: .destructive, title: "Delete") { action, indexPath in
             // handle action by updating model with deletion
             
+            self.updateModel(at: indexPath)
             
         }
         
-        return  (orientation == .right ? [moveAction, deleteAction] : nil)
+        let renameAction = SwipeAction(style: .default, title: "Rename") { action, indexPath in
+            // handle action by updating model with deletion
+            
+            var textField = UITextField()
+            
+            let alert = UIAlertController(title: "Rename Dot", message: "", preferredStyle: .alert)
+            
+            let action = UIAlertAction(title: "Rename Dot", style: .default) { (action) in
+                
+                if let poolForRenaming = self.dots?[indexPath.row] {
+                    do {
+                        try self.realm.write {
+                            poolForRenaming.name = textField.text!
+                            print("Success renaming dot")
+                            self.tableView.reloadData()
+                        }
+                    } catch {
+                        print("Error renaming dot, \(error)")
+                    }
+                }
+            }
+            
+            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+            
+            alert.addTextField { (alertTextField) in
+                alertTextField.text = self.dots?[indexPath.row].name
+                alertTextField.autocapitalizationType = .sentences
+                alertTextField.autocorrectionType = .yes
+                textField = alertTextField
+            }
+            
+            alert.addAction(action)
+            alert.addAction(cancelAction)
+            self.present(alert, animated: true, completion: nil)
+            
+        }
+        
+        return  (orientation == .right ? [renameAction, deleteAction] : nil)
         
     }
     
@@ -208,6 +253,3 @@ extension DotsViewController : SwipeTableViewCellDelegate {
 // 1. Table Swipe Actions
 // 1b.  dotArray[indexPath.row].setValue("good/bad", forKey: "value")
 // 1b.
-//     context.delete(dotArray[indexPath.row]) #removes data from permanent container
-//     dotArray.remove(at: indexPath.row) #removes from dotArray used to loadup tableview
-// https://github.com/TheMindStudios/WheelPicker

@@ -50,12 +50,17 @@ class PoolsViewController: UITableViewController {
             print("Reloaded")
         }
         
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        
         alert.addTextField { (alertTextField) in
             alertTextField.placeholder = "Create new pool"
+            alertTextField.autocapitalizationType = .sentences
+            alertTextField.autocorrectionType = .yes
             textField = alertTextField
         }
         
         alert.addAction(action)
+        alert.addAction(cancelAction)
         present(alert, animated: true, completion: nil)
         
         
@@ -116,7 +121,7 @@ class PoolsViewController: UITableViewController {
     
     func loadPools() {
         
-         pools = realm.objects(Pool.self)
+        pools = realm.objects(Pool.self)
         
         tableView.reloadData()
     }
@@ -159,6 +164,10 @@ class PoolsViewController: UITableViewController {
 //MARK: - Extension: Search Bar
 extension PoolsViewController: UISearchBarDelegate {
     
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        searchBar.tintColor = UIColor.black
+    }
+    
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         
         print(searchBar.text!)
@@ -195,7 +204,47 @@ extension PoolsViewController : SwipeTableViewCellDelegate {
         
         deleteAction.image = UIImage(named: "delete-icon")
         
-        return  (orientation == .right ? [deleteAction] : nil)
+        let renameAction = SwipeAction(style: .default, title: "Rename") { action, indexPath in
+            // handle action by updating model with deletion
+            
+            var textField = UITextField()
+            
+            let alert = UIAlertController(title: "Rename Pool", message: "", preferredStyle: .alert)
+            
+            let action = UIAlertAction(title: "Rename Pool", style: .default) { (action) in
+                
+                if let poolForRenaming = self.pools?[indexPath.row] {
+                    do {
+                        try self.realm.write {
+                            poolForRenaming.name = textField.text!
+                            print("Success renaming pool")
+                            self.tableView.reloadData()
+                        }
+                    } catch {
+                        print("Error renaming pool, \(error)")
+                    }
+                }
+            }
+            
+            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+            
+            alert.addTextField { (alertTextField) in
+                alertTextField.text = self.pools?[indexPath.row].name
+                alertTextField.autocapitalizationType = .sentences
+                alertTextField.autocorrectionType = .yes
+                textField = alertTextField
+            }
+            
+            alert.addAction(action)
+            alert.addAction(cancelAction)
+            self.present(alert, animated: true, completion: nil)
+            
+            
+            
+            
+        }
+        
+        return  (orientation == .right ? [deleteAction, renameAction] : nil)
         
     }
     

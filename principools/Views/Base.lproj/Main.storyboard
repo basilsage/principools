@@ -80,9 +80,6 @@
                                     <rect key="frame" x="0.0" y="0.0" width="376" height="43.5"/>
                                     <autoresizingMask key="autoresizingMask"/>
                                 </tableViewCellContentView>
-                                <connections>
-                                    <segue destination="t1A-7r-o4V" kind="presentation" identifier="goToMovePrinciples" id="CVU-sA-r6g"/>
-                                </connections>
                             </tableViewCell>
                         </prototypes>
                         <connections>
@@ -100,6 +97,7 @@
                     </navigationItem>
                     <connections>
                         <segue destination="J3e-3F-Zjf" kind="show" identifier="goToDots" id="fu3-hm-r65"/>
+                        <segue destination="t1A-7r-o4V" kind="show" identifier="goToMovePrinciples" id="Lbu-Ld-ceM"/>
                     </connections>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="UhY-yv-8Gn" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -150,23 +148,21 @@
             </objects>
             <point key="canvasLocation" x="1710" y="130"/>
         </scene>
-        <!--Table View Controller-->
+        <!--Move to Different Pool:-->
         <scene sceneID="gpS-Ct-xCP">
             <objects>
-                <tableViewController id="t1A-7r-o4V" sceneMemberID="viewController">
+                <tableViewController id="t1A-7r-o4V" customClass="MovePrinciplesViewController" customModule="principools" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="tSe-fG-03n">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                        <label key="tableHeaderView" opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Move to principle:" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="RQq-UD-92B">
+                        <searchBar key="tableHeaderView" contentMode="redraw" id="jZO-aX-8EV">
                             <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
-                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                            <fontDescription key="fontDescription" type="system" pointSize="17"/>
-                            <nil key="textColor"/>
-                            <nil key="highlightedColor"/>
-                        </label>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                            <textInputTraits key="textInputTraits"/>
+                        </searchBar>
                         <prototypes>
-                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" id="3bD-gh-Pox">
+                            <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="Cell" id="3bD-gh-Pox">
                                 <rect key="frame" x="0.0" y="72" width="414" height="44"/>
                                 <autoresizingMask key="autoresizingMask"/>
                                 <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="3bD-gh-Pox" id="BOt-pc-Ouo">
@@ -180,10 +176,11 @@
                             <outlet property="delegate" destination="t1A-7r-o4V" id="mer-NX-4MN"/>
                         </connections>
                     </tableView>
+                    <navigationItem key="navigationItem" title="Move to Different Pool:" id="KyM-cV-kRL"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="APk-tp-tan" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="865" y="916"/>
+            <point key="canvasLocation" x="864" y="816"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="Dfd-rI-eah">

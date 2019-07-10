@@ -12,8 +12,12 @@ import SwipeCellKit
 
 class PrincipleViewController: UITableViewController {
     
+    
     var principles : Results<Principle>?
     let realm = try! Realm()
+    
+    var indexPathForMoveAction : IndexPath? 
+    
     
     var selectedPool : Pool? {
         didSet {
@@ -26,10 +30,13 @@ class PrincipleViewController: UITableViewController {
         
         tableView.rowHeight = 80
         
-
     }
 
-    
+    override func viewDidAppear(_ animated: Bool) {
+        
+        tableView.reloadData()
+        
+    }
     
     
     //MARK: - TableView Datasource Methods
@@ -71,6 +78,7 @@ class PrincipleViewController: UITableViewController {
     // Leave this for now
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
         performSegue(withIdentifier: "goToDots", sender: self)
         
     }
@@ -78,19 +86,26 @@ class PrincipleViewController: UITableViewController {
     // triggered just before we perform segue
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         
-        
         if segue.identifier == "goToDots" {
+            print("go to dots segue preparing")
             let destinationVC = segue.destination as! DotsViewController
             
             if let indexPath = tableView.indexPathForSelectedRow {
                 destinationVC.selectedPrinciple = principles?[indexPath.row]
+                print("destination vc selected principle set")
             }
-        } else if segue.identifier != "goToMovePrinciples" {
-            print("poo")
-        }
+        } else {
+            print("go to move principles segue preparing")
+            let destinationVC = segue.destination as! MovePrinciplesViewController
+            
+            //bug is because there is no indexpath selected, unlike didSelectRowAt.
+            
+            destinationVC.selectedPrinciple = principles?[(indexPathForMoveAction?.row)!]
+            destinationVC.poolToBeVacated = selectedPool
+            print("destination vc selected principle set")
+            }
     }
-    
-    
+
     //MARK: - Data Manipulation Methods
     // save & load
 
@@ -129,12 +144,18 @@ class PrincipleViewController: UITableViewController {
             
         }
         
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        
         alert.addTextField { (alertTextField) in
             alertTextField.placeholder = "Create new principle"
+            alertTextField.autocapitalizationType = .sentences
+            alertTextField.autocorrectionType = .yes
             textField = alertTextField
+            
         }
         
         alert.addAction(action)
+        alert.addAction(cancelAction)
         
         present(alert, animated: true, completion: nil)
         
@@ -176,6 +197,10 @@ class PrincipleViewController: UITableViewController {
 
 extension PrincipleViewController: UISearchBarDelegate {
     
+    func searchBarTextDidBeginEditing(_ searchBar: UISearchBar) {
+        searchBar.tintColor = UIColor.black
+    }
+    
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         
         print(searchBar.text!)
@@ -205,7 +230,57 @@ extension PrincipleViewController : SwipeTableViewCellDelegate {
         
         let moveAction = SwipeAction(style: .default, title: "Move") { action, indexPath in
             // handle action by updating model with new classification
+            
+            self.indexPathForMoveAction = indexPath
+            
+            let backItem = UIBarButtonItem()
+            backItem.title = "Cancel"
+            self.navigationItem.backBarButtonItem = backItem
+            
             self.performSegue(withIdentifier: "goToMovePrinciples", sender: self)
+            print("move segue triggered")
+            
+            
+        }
+        
+        let renameAction = SwipeAction(style: .default, title: "Rename") { action, indexPath in
+            // handle action by updating model with deletion
+            
+            var textField = UITextField()
+            
+            let alert = UIAlertController(title: "Rename Principle", message: "", preferredStyle: .alert)
+            
+            let action = UIAlertAction(title: "Rename Principle", style: .default) { (action) in
+                
+                if let poolForRenaming = self.principles?[indexPath.row] {
+                    do {
+                        try self.realm.write {
+                            poolForRenaming.name = textField.text!
+                            print("Success renaming principle")
+                            self.tableView.reloadData()
+                        }
+                    } catch {
+                        print("Error renaming principle, \(error)")
+                    }
+                }
+            }
+            
+            let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+            
+            alert.addTextField { (alertTextField) in
+                alertTextField.text = self.principles?[indexPath.row].name
+                alertTextField.autocapitalizationType = .sentences
+                alertTextField.autocorrectionType = .yes
+                textField = alertTextField
+            }
+            
+            alert.addAction(action)
+            alert.addAction(cancelAction)
+            self.present(alert, animated: true, completion: nil)
+            
+            
+            
+            
         }
         
         let deleteAction = SwipeAction(style: .destructive, title: "Delete") { action, indexPath in
@@ -215,7 +290,7 @@ extension PrincipleViewController : SwipeTableViewCellDelegate {
         
         deleteAction.image = UIImage(named: "delete-icon")
         
-        return  (orientation == .right ? [moveAction, deleteAction] : nil)
+        return  (orientation == .right ? [deleteAction, renameAction, moveAction] : nil)
         
     }
     
